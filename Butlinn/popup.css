@@ -1,0 +1,70 @@
+/* popup.css */
+
+@import url('shared.css'); /* Imports the toggle switch styles */
+
+:root {
+    --bg-color: #1E1D2B;
+    --text-color: #C0BFD1;
+    --text-color-light: #E0E0E0;
+    --border-color: #8B7955;
+    --button-primary-bg: #3A3852;
+    --button-primary-hover-bg: #4C4A69;
+    --toggle-track-off: #3A3852;
+    --toggle-knob: #E0E0E0;
+    --toggle-knob-on: #C1A76A;
+    --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+}
+
+body {
+    margin: 0;
+    width: 320px; /* This width is now safely contained to the popup only */
+    background-color: var(--bg-color);
+    font-family: var(--font);
+    color: var(--text-color);
+}
+
+.container {
+    padding: 16px;
+}
+
+.settings-box {
+    border: 2px dashed var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.action-button {
+    text-align: center;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-color-light);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+}
+
+.action-button:active {
+    transform: scale(0.98);
+}
+
+#dashboardButton {
+    background-color: var(--button-primary-bg);
+}
+#dashboardButton:hover {
+    background-color: var(--button-primary-hover-bg);
+}
+
+.action-button--secondary {
+    background-color: transparent;
+    color: var(--text-color);
+}
+.action-button--secondary:hover {
+    background-color: rgba(139, 121, 85, 0.1);
+    color: var(--text-color-light);
+}
