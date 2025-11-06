@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Butlinn - Your Personal AI Butler",
+  "version": "2.0",
+  "description": "A private and secure AI that learns about you to provide a personalized experience.",
+  
+  "permissions": [
+    "history",
+    "offscreen",
+    "storage",
+    "bookmarks",
+    "alarms",
+    "activeTab",
+    "scripting"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "action": {
+    "default_popup": "popup.html"
+  },
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "vendor/pdf.worker.mjs",
+        "assets/icons/Bimage.png"
+      ],
+      "matches": [ "<all_urls>" ]
+    }
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "features/relationship_manager.js", 
+        "content_script.js"
+      ],
+      "css": [
+        "content_script.css"
+      ]
+    }
+  ],
+  
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  }
+}

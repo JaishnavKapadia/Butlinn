@@ -1,0 +1,265 @@
+/* ui/dashboard_relationships.css */
+
+/* --- THIS IS THE FIX --- */
+
+/* The main panel is now a flex column that fills its container. */
+.relationships-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 16px;
+    padding: 20px;
+}
+
+/* This section is now instructed to GROW and handle its own scrolling. */
+.people-section {
+    flex-grow: 1;       /* Takes up all available vertical space */
+    overflow-y: auto;   /* Will only show a scrollbar if its content overflows */
+    padding-right: 10px;
+    min-height: 0;      /* Critical for flexbox scrolling layouts */
+}
+
+/* This section is told NOT to grow, keeping it at the bottom. */
+.uncategorized-section {
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+    max-height: 25%;
+    overflow-y: auto;
+}
+/* We no longer need a max-height on individual drop zones.
+   The parent .people-section will handle all scrolling. */
+.person-drop-zone {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    min-height: 50px;
+    border: 2px dashed #4A485C;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.2s ease;
+    position: relative;
+    /* max-height and overflow-y are removed from here */
+}
+
+.uncategorized-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.uncategorized-header h5 { margin: 0; }
+
+#clear-uncategorized-btn {
+    background: #5c3a3a;
+    color: #f0c8c8;
+    border: 1px solid #8b5555;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#categories-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.category-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.category-container h6 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-color-light);
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.person-drop-zone.drag-over {
+    border-color: var(--border-color);
+    background-color: #3A3852;
+}
+
+.person-drop-zone:empty::before {
+    content: 'Drop contact here';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #6a6882;
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* Custom Scrollbar for the .people-section */
+.people-section {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+.people-section::-webkit-scrollbar {
+  width: 8px;
+}
+.people-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+.people-section::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
+}
+
+#uncategorized-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 30px;
+}
+
+.person-card {
+    background-color: #3A3852;
+    border: 1px solid #4A485C;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.person-card:active { cursor: grabbing; }
+.person-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    cursor: grabbing;
+}
+
+.person-card.drag-over {
+    border: 2px solid var(--border-color);
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(193, 167, 106, 0.3);
+}
+
+.compact-card {
+    padding: 10px 12px;
+}
+.compact-card .card-header {
+    flex-direction: row;
+    align-items: center;
+    font-size: 14px;
+}
+.closeness-indicator {
+    font-size: 10px;
+    color: var(--border-color);
+}
+
+.person-card:not(.compact-card) {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-color: #6a6882;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color-light);
+}
+.card-header button {
+    font-size: 11px;
+    padding: 2px 6px;
+    background-color: var(--panel-bg);
+    border: 1px solid #555;
+    color: var(--text-color-light);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.card-details-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    align-items: center;
+    font-size: 13px;
+}
+.card-details-grid label { font-weight: bold; opacity: 0.7; }
+.aliases-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    list-style: none;
+    padding: 0; margin: 0;
+}
+.aliases-list li {
+    background-color: #2A283C;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+.notes-section p {
+    font-size: 13px;
+    margin: 0;
+    padding-top: 8px;
+    border-top: 1px solid #4a485c;
+    color: var(--text-color);
+}
+
+.alias-item {
+    background-color: #3A3852;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: grab;
+}
+.alias-item.dragging { opacity: 0.5; }
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
+.modal-overlay.hidden { display: none; }
+.modal-content {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.modal-content h3 { margin: 0; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12px; opacity: 0.8; }
+.form-group input, .form-group textarea {
+    background-color: #3A3852;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 8px;
+    color: var(--text-color-light);
+    font-size: 14px;
+}
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+.modal-actions button {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+#modal-save-btn { background-color: var(--border-color); color: var(--bg-color); }
+#modal-cancel-btn { background-color: #3A3852; color: var(--text-color); }

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Butlinn - Your Personal AI Butler</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="ui/dashboard_relationships.css">
+</head>
+<body>
+
+  <!-- Modal for editing a person's details -->
+  <div id="edit-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3>Edit Relationship</h3>
+        <div class="form-group">
+            <label for="edit-primaryName">Primary Name</label>
+            <input type="text" id="edit-primaryName">
+        </div>
+        <div class="form-group">
+            <label for="edit-closeness">Closeness</label>
+            <input type="range" id="edit-closeness" min="1" max="5" step="1">
+        </div>
+        <div class="form-group">
+            <label for="edit-tone">Preferred Tone</label>
+            <input type="text" id="edit-tone">
+        </div>
+        <div class="form-group">
+            <label for="edit-notes">Notes</label>
+            <textarea id="edit-notes" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+            <button id="modal-cancel-btn">Cancel</button>
+            <button id="modal-save-btn">Save</button>
+        </div>
+    </div>
+  </div>
+
+
+  <div class="dashboard-container">
+    <header class="dashboard-header">Butlinn</header>
+
+    <main class="dashboard-main">
+      
+      <div class="main-content-area">
+        <div class="relationships-wrapper panel">
+            <div class="relationships-panel">
+                <h3>Relationships</h3>
+                
+                <div class="people-section">
+                    <div id="categories-container"></div>
+                </div>
+
+                <div class="uncategorized-section">
+                    <div class="uncategorized-header">
+                        <h5>Uncategorized Contacts</h5>
+                        <button id="clear-uncategorized-btn">Clear All</button>
+                    </div>
+                    <div id="uncategorized-list" class="person-drop-zone"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <aside class="sidebar-right">
+        <div class="panel">
+            <h3>Features Control</h3>
+            <div class="settings-list">
+              <div class="setting-item">
+                <label for="writingSuggestionsToggle">Writing Suggestions</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="writingSuggestionsToggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label for="tailorToggle">Tailor Suggestions</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="tailorToggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label for="autoProfileUpdateToggle">Auto-Profile Update</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="autoProfileUpdateToggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label for="historyContextToggle">History Context</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="historyContextToggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+        </div>
+
+        <div class="panel file-management">
+            <h4>All Uploaded Files (Vault)</h4>
+            <ul id="fileList"><li>No files in vault.</li></ul>
+            <div class="file-actions-area">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="hidden-file-input">
+                    <label for="fileInput" class="custom-file-button">Choose File</label>
+                    <span id="fileNameDisplay" class="file-name-display">No file chosen</span>
+                </div>
+                <button id="addFileButton">Add</button>
+            </div>
+            <button id="remakeProfileButton" class="action-button-fullwidth">Remake Profile</button>
+        </div>
+
+        <div class="panel chat-panel">
+            <h4>Chat with Butlinn</h4>
+            <div id="aiResponse" class="hidden"></div>
+            <textarea id="userInput" placeholder="Ask Butlinn... (Enter to send)"></textarea>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+  
+  <script type="module" src="ui/dashboard_relationships.js"></script>
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>
