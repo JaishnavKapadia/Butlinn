@@ -1,7 +1,5 @@
 /* popup.css */
 
-@import url('shared.css'); /* Imports the toggle switch styles */
-
 :root {
     --bg-color: #1E1D2B;
     --text-color: #C0BFD1;
@@ -17,7 +15,7 @@
 
 body {
     margin: 0;
-    width: 320px; /* This width is now safely contained to the popup only */
+    width: 320px;
     background-color: var(--bg-color);
     font-family: var(--font);
     color: var(--text-color);
@@ -67,4 +65,57 @@ body {
 .action-button--secondary:hover {
     background-color: rgba(139, 121, 85, 0.1);
     color: var(--text-color-light);
+}
+
+/* --- STYLES MERGED FROM shared.css --- */
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.setting-item label {
+    font-size: 16px;
+    color: var(--text-color-light);
+}
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--toggle-track-off);
+    transition: .4s;
+    border-radius: 28px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--toggle-knob);
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider:before {
+    background-color: var(--toggle-knob-on);
+    transform: translateX(22px);
 }

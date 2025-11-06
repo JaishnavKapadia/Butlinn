@@ -1,0 +1,144 @@
+/* dashboard.css */
+
+:root {
+    --bg-color: #1E1D2B;
+    --text-color: #C0BFD1;
+    --text-color-light: #E0E0E0;
+    --border-color: #8B7955;
+    --panel-bg: #2A283C;
+    --toggle-track-off: #3A3852;
+    --toggle-knob: #E0E0E0;
+    --toggle-knob-on: #C1A76A;
+    --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    font-family: var(--font);
+    color: var(--text-color);
+    overflow: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.dashboard-header {
+    flex-shrink: 0;
+    text-align: left;
+    font-size: 2.5em;
+    font-weight: 300;
+    color: var(--text-color-light);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+}
+
+.dashboard-main {
+    display: grid;
+    grid-template-columns: 1fr 30%;
+    flex-grow: 1;
+    gap: 24px;
+    overflow: hidden; 
+    min-height: 0;
+}
+
+.panel {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+.panel h3, .panel h4 {
+    margin-top: 0;
+    color: var(--text-color-light);
+    font-weight: 500;
+}
+
+.main-content-area {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.relationships-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+}
+
+.sidebar-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* --- STYLES MERGED FROM shared.css --- */
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.setting-item label {
+    font-size: 16px;
+    color: var(--text-color-light);
+}
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--toggle-track-off);
+    transition: .4s;
+    border-radius: 28px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--toggle-knob);
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider:before {
+    background-color: var(--toggle-knob-on);
+    transform: translateX(22px);
+}

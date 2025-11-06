@@ -9,6 +9,7 @@ let fullContext = '';
 let iconDataURL = null;
 let selectionDebounceTimer = null;
 let isButlinnActive = false;
+let activeEditorElement = null; // <-- FIX: Variable to store the correct text field
 
 let isDragging = false;
 let initialMouseX, initialMouseY;
@@ -61,6 +62,7 @@ async function handleSelectionChange() {
             return;
         }
         savedRange = selection.getRangeAt(0).cloneRange();
+        activeEditorElement = parentEditable; // <-- FIX: Save the correct text field here
         showTriggerButton(savedRange);
     }, 200);
 }
@@ -96,7 +98,6 @@ async function getIconDataURL() {
         iconDataURL = response.dataUrl;
         return iconDataURL;
     } catch (error) {
-        // --- THIS IS THE FIX: Handles the "context invalidated" error gracefully ---
         if (error.message.includes('Extension context invalidated') || error.message.includes('Receiving end does not exist')) {
             console.log("Butlinn: Context invalidated. Please reload the page to fix.");
         } else {
@@ -109,14 +110,13 @@ async function getIconDataURL() {
 async function showTriggerButton(range) {
     if (!triggerButton) {
         const imageData = await getIconDataURL();
-        if (!imageData) return; // Stop if the icon couldn't be fetched
+        if (!imageData) return; 
         
         triggerButton = document.createElement('button');
         triggerButton.id = 'butlinn-trigger-btn';
         triggerButton.innerHTML = `<img src="${imageData}" alt="Butlinn">`;
         triggerButton.addEventListener('click', handleTriggerClick);
     }
-    // Check if the button is still in the DOM before trying to append it again
     if (!triggerButton.isConnected) {
         document.body.appendChild(triggerButton);
     }
@@ -153,21 +153,8 @@ async function handleTriggerClick(event) {
     hideTriggerButton();
 
     if (isTailorEnabled) {
-        const rects = savedRange.getClientRects();
-        if (!rects || rects.length === 0) {
-            console.error('Butlinn CS: The savedRange no longer has valid coordinates.');
-            return;
-        }
-        const selectionRect = rects[0];
-        const selectionBounds = {
-            x: selectionRect.x,
-            y: selectionRect.y,
-            width: selectionRect.width,
-            height: selectionRect.height,
-            devicePixelRatio: window.devicePixelRatio || 1
-        };
-        console.log('Butlinn CS: Calculated selectionBounds from savedRange:', selectionBounds);
-        relationshipManager.startWorkflow(savedRange.cloneRange(), selectionBounds);
+        // <-- FIX: Pass the saved text field to the workflow
+        relationshipManager.startWorkflow(savedRange.cloneRange(), activeEditorElement);
     } else {
         activateButlinn(savedRange.cloneRange(), { useRelationship: false });
     }
@@ -195,19 +182,6 @@ async function activateButlinn(range, options = {}) {
 }
 
 function handleBackgroundMessages(request, sender, sendResponse) {
-    if (request.type === 'content/vision_analysis_result') {
-        if (relationshipManager._panelHost) {
-            if (request.data.success) {
-                relationshipManager._populatePanel(request.data.recipients, request.data.debugImageUrl);
-            } else {
-                const errorMessage = request.data.error || "Failed to analyze screen.";
-                console.error("Butlinn Error:", errorMessage);
-                relationshipManager._showError(errorMessage);
-            }
-        }
-        return;
-    }
-
     if (!isButlinnActive) return;
     const preview = activeToolbar?.querySelector('.butlinn-suggestion-preview');
     switch (request.type) {
@@ -486,4 +460,5 @@ function cleanup() {
     isDragging = false;
     isDropdownDragging = false;
     suggestionVariants = [];
+    activeEditorElement = null; // <-- FIX: Reset the stored element
 }

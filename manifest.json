@@ -5,11 +5,8 @@
   "description": "A private and secure AI that learns about you to provide a personalized experience.",
   
   "permissions": [
-    "history",
     "offscreen",
     "storage",
-    "bookmarks",
-    "alarms",
     "activeTab",
     "scripting"
   ],
@@ -19,18 +16,17 @@
   ],
 
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "ui/popup/popup.html"
   },
 
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "service/background.js",
     "type": "module"
   },
 
   "web_accessible_resources": [
     {
       "resources": [
-        "vendor/pdf.worker.mjs",
         "assets/icons/Bimage.png"
       ],
       "matches": [ "<all_urls>" ]
@@ -43,11 +39,12 @@
         "<all_urls>"
       ],
       "js": [
-        "features/relationship_manager.js", 
-        "content_script.js"
+        "features/tailor/recipient_finder.js",
+        "features/tailor/relationship_manager.js", 
+        "ui/content/content_script.js"
       ],
       "css": [
-        "content_script.css"
+        "ui/content/content_script.css"
       ]
     }
   ],

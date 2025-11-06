@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Butlinn - Your Personal AI Butler</title>
   <link rel="stylesheet" href="dashboard.css">
-  <link rel="stylesheet" href="ui/dashboard_relationships.css">
+  <link rel="stylesheet" href="dashboard_relationships.css">
 </head>
 <body>
 
@@ -79,48 +79,14 @@
                   <span class="slider"></span>
                 </label>
               </div>
-              <div class="setting-item">
-                <label for="autoProfileUpdateToggle">Auto-Profile Update</label>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="autoProfileUpdateToggle">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <label for="historyContextToggle">History Context</label>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="historyContextToggle">
-                  <span class="slider"></span>
-                </label>
-              </div>
             </div>
-        </div>
-
-        <div class="panel file-management">
-            <h4>All Uploaded Files (Vault)</h4>
-            <ul id="fileList"><li>No files in vault.</li></ul>
-            <div class="file-actions-area">
-                <div class="file-input-wrapper">
-                    <input type="file" id="fileInput" class="hidden-file-input">
-                    <label for="fileInput" class="custom-file-button">Choose File</label>
-                    <span id="fileNameDisplay" class="file-name-display">No file chosen</span>
-                </div>
-                <button id="addFileButton">Add</button>
-            </div>
-            <button id="remakeProfileButton" class="action-button-fullwidth">Remake Profile</button>
-        </div>
-
-        <div class="panel chat-panel">
-            <h4>Chat with Butlinn</h4>
-            <div id="aiResponse" class="hidden"></div>
-            <textarea id="userInput" placeholder="Ask Butlinn... (Enter to send)"></textarea>
         </div>
       </aside>
 
     </main>
   </div>
   
-  <script type="module" src="ui/dashboard_relationships.js"></script>
+  <script type="module" src="dashboard_relationships.js"></script>
   <script type="module" src="dashboard.js"></script>
 </body>
 </html>

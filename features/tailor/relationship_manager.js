@@ -1,4 +1,4 @@
-// features/relationship_manager.js
+// features/tailor/relationship_manager.js
 
 const relationshipManager = {
     _currentRange: null,
@@ -10,77 +10,35 @@ const relationshipManager = {
     _initialMouseY: 0,
     _initialPanelX: 0,
     _initialPanelY: 0,
-    _loadingInterval: null,
 
     async _loadCSS() {
         if (this._cssText) return;
         try {
-            this._cssText = await chrome.runtime.sendMessage({ type: 'get_css', path: 'features/relationship_manager.css' });
+            this._cssText = await chrome.runtime.sendMessage({ type: 'get_css', path: 'features/tailor/relationship_manager.css' });
         } catch (e) {
             console.error("Butlinn: Could not load component CSS.", e);
             this._cssText = '';
         }
     },
 
-    async startWorkflow(range, selectionBounds) {
+    async startWorkflow(range, editorElement) {
         this._currentRange = range;
         await this._createPanel();
         
-        try {
-               console.log('Sending analysis request with bounds:', selectionBounds);
-               if (!selectionBounds || typeof selectionBounds.x !== 'number' || 
-                   typeof selectionBounds.y !== 'number' || 
-                   typeof selectionBounds.width !== 'number' || 
-                   typeof selectionBounds.height !== 'number') {
-                   throw new Error('Invalid selection bounds for screenshot');
-               }
-
-            chrome.runtime.sendMessage({
-                type: 'relationships/analyze_screen',
-                    data: { 
-                        selectionBounds: selectionBounds,
-                        timestamp: new Date().toISOString()
-                    }
-            });
-
-            const loader = this._shadowRoot.querySelector('.butlinn-panel-loader');
-            if (loader) {
-                let dots = '';
-                this._loadingInterval = setInterval(() => {
-                    dots = dots.length >= 3 ? '' : dots + '.';
-                    loader.textContent = 'Analyzing' + dots;
-                }, 500);
-            }
-        } catch (error) {
-                console.error('Failed to start analysis:', {
-                    error: error.message,
-                    stack: error.stack,
-                    bounds: selectionBounds
-                });
-                this._showError(`Analysis failed: ${error.message}`);
+        if (!editorElement) {
+            console.warn("Butlinn: Editor element not provided to workflow. Only showing 'General Audience'.");
+            this._populatePanel([]);
+            return;
         }
-    },
 
-    _showError(message) {
-        if (this._shadowRoot) {
-            if (this._loadingInterval) {
-                clearInterval(this._loadingInterval);
-                this._loadingInterval = null;
-            }
-
-            const loader = this._shadowRoot.querySelector('.butlinn-panel-loader');
-            const options = this._shadowRoot.querySelector('.butlinn-panel-options');
-            
-            if (loader) {
-                loader.textContent = message;
-                loader.style.color = '#ff9a9a';
-                loader.style.fontStyle = 'normal';
-                
-                if (options) options.style.display = 'none';
-                
-                setTimeout(() => this._cleanup(), 3500);
-            }
+        const recipient = window.recipientFinder.findRecipientFromDOM(editorElement);
+        
+        const recipients = [];
+        if (recipient) {
+            recipients.push(recipient);
         }
+        
+        this._populatePanel(recipients);
     },
 
     async _createPanel() {
@@ -108,15 +66,10 @@ const relationshipManager = {
                         </div>
                     </div>
                 </div>
-                <div class="butlinn-debug-image-container" style="display: none;">
-                    <img class="butlinn-debug-image" />
-                </div>
-                <div class="butlinn-panel-loader">Analyzing...</div>
                 <div class="butlinn-panel-options"></div>
             </div>
         `;
 
-        // --- THIS IS THE FIX (Part 3): Updated width for positioning ---
         const panelWidth = 340;
         const padding = 30;
         this._panelHost.style.position = 'fixed';
@@ -140,25 +93,12 @@ const relationshipManager = {
         }
     },
     
-    _populatePanel(recipients, debugImageUrl) {
-        if (this._loadingInterval) {
-            clearInterval(this._loadingInterval);
-            this._loadingInterval = null;
-        }
-
-        const loader = this._shadowRoot.querySelector('.butlinn-panel-loader');
-        if (loader) loader.remove();
-        
-        if (debugImageUrl) {
-            const imageContainer = this._shadowRoot.querySelector('.butlinn-debug-image-container');
-            const debugImage = this._shadowRoot.querySelector('.butlinn-debug-image');
-            debugImage.src = debugImageUrl;
-            imageContainer.style.display = 'block';
-        }
-        
+    _populatePanel(recipients) {
         const optionsContainer = this._shadowRoot.querySelector('.butlinn-panel-options');
         optionsContainer.innerHTML = '';
+
         const allOptions = ["General Audience", ...recipients];
+        
         allOptions.forEach(name => {
             const button = document.createElement('button');
             button.textContent = name;
@@ -179,10 +119,6 @@ const relationshipManager = {
     },
     
     _cleanup() {
-        if (this._loadingInterval) {
-            clearInterval(this._loadingInterval);
-            this._loadingInterval = null;
-        }
         if (this._panelHost) {
             document.removeEventListener('mousedown', this._onDocumentClick);
             document.removeEventListener('mousemove', this._onDragMove);

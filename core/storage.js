@@ -2,9 +2,8 @@
 // --- Manages all IndexedDB storage operations for the extension. ---
 
 const DB_NAME = "ButlinnVault";
-const STORE_NAME = "files";
 const RELATIONSHIPS_STORE_NAME = "relationships";
-const DB_VERSION = 2; // <-- INCREMENTED VERSION to trigger upgrade
+const DB_VERSION = 2;
 
 /**
  * Opens a connection to the IndexedDB database.
@@ -14,17 +13,10 @@ function openDb() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-        // This event is only triggered for new databases or version changes.
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: 'name' });
-            }
-            // --- NEW: Create the relationships store ---
             if (!db.objectStoreNames.contains(RELATIONSHIPS_STORE_NAME)) {
                 const relationshipStore = db.createObjectStore(RELATIONSHIPS_STORE_NAME, { keyPath: 'id' });
-                // Create an index on 'aliases' to allow searching by any alias.
-                // 'multiEntry: true' allows indexing each item in the aliases array.
                 relationshipStore.createIndex('aliases', 'aliases', { unique: false, multiEntry: true });
             }
         };
@@ -45,43 +37,7 @@ async function getStore(storeName, mode) {
     return db.transaction(storeName, mode).objectStore(storeName);
 }
 
-// --- File Management Functions (Unchanged) ---
-
-export async function addFile(file) {
-    const store = await getStore(STORE_NAME, 'readwrite');
-    return new Promise((resolve, reject) => {
-        const request = store.put(file);
-        request.onsuccess = () => resolve();
-        request.onerror = (event) => reject(event.target.error);
-    });
-}
-
-export async function deleteFile(filename) {
-    const store = await getStore(STORE_NAME, 'readwrite');
-    return new Promise((resolve, reject) => {
-        const request = store.delete(filename);
-        request.onsuccess = () => resolve();
-        request.onerror = (event) => reject(event.target.error);
-    });
-}
-
-export async function getAllFiles() {
-    const store = await getStore(STORE_NAME, 'readonly');
-    return new Promise((resolve, reject) => {
-        const request = store.getAll();
-        request.onsuccess = () => resolve(request.result || []);
-        request.onerror = (event) => reject(event.target.error);
-    });
-}
-
-export async function getFile(filename) {
-    const store = await getStore(STORE_NAME, 'readonly');
-    return new Promise((resolve, reject) => {
-        const request = store.get(filename);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = (event) => reject(event.target.error);
-    });
-}
+// --- File Management Functions have been removed ---
 
 export async function deleteRelationshipById(personId) {
     const store = await getStore(RELATIONSHIPS_STORE_NAME, 'readwrite');
@@ -94,7 +50,6 @@ export async function deleteRelationshipById(personId) {
 
 export async function deleteMultipleRelationships(personIds) {
     const store = await getStore(RELATIONSHIPS_STORE_NAME, 'readwrite');
-    // We can just loop, but for performance, a single transaction is better.
     return Promise.all(personIds.map(id => {
         return new Promise((resolve, reject) => {
             const request = store.delete(id);
@@ -104,8 +59,7 @@ export async function deleteMultipleRelationships(personIds) {
     }));
 }
 
-
-// --- NEW: Relationship Management Functions ---
+// --- Relationship Management Functions ---
 
 /**
  * Adds or updates a relationship in the database.

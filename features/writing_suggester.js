@@ -28,8 +28,17 @@ export async function getSuggestion(data) {
     let prompt;
 
     if (rewriteStyle === 'initial' && useRelationship && recipientAlias) {
-        const relationship = await storage.getRelationshipByAlias(recipientAlias);
         
+        // --- THIS IS THE FIX ---
+        // Instead of a direct, case-sensitive lookup, we now get all relationships
+        // and perform a case-insensitive search against all of their aliases.
+        const allRelationships = await storage.getAllRelationships();
+        const normalizedRecipient = recipientAlias.trim().toLowerCase();
+        const relationship = allRelationships.find(person =>
+            person.aliases.some(alias => alias.trim().toLowerCase() === normalizedRecipient)
+        );
+        // -----------------------
+
         if (relationship) {
             // SCENARIO A: We know this person.
             prompt = `
@@ -54,11 +63,13 @@ export async function getSuggestion(data) {
               
               SELECTED TEXT: "${selectedText}"
             `;
+            // If the user proceeds, create a new uncategorized contact for them.
             if (useRelationship && recipientAlias) {
+                const trimmedAlias = recipientAlias.trim();
                 const newPerson = {
                     id: crypto.randomUUID(),
-                    primaryName: recipientAlias,
-                    aliases: [recipientAlias],
+                    primaryName: trimmedAlias,
+                    aliases: [trimmedAlias],
                     closeness: 0, // Default to uncategorized
                     preferredTone: 'Professional',
                     notes: ''
@@ -68,9 +79,7 @@ export async function getSuggestion(data) {
         }
 
     } else if (rewriteStyle === 'initial') {
-        // --- THIS IS THE FIX ---
         // SCENARIO C: Default professional rewrite (toggle is off or "General Audience")
-        // The new prompt is much more specific to prevent "describing" the user.
         prompt = `
           You are a professional writing assistant. Your task is to rephrase the "SELECTED TEXT" to make it sound more professional, clear, and 
           suitable for a general audience.
@@ -83,10 +92,9 @@ export async function getSuggestion(data) {
 
           SELECTED TEXT: "${selectedText}"
         `;
-        // -----------------------
 
     } else {
-        // Length adjustment prompt (unchanged)
+        // Length adjustment prompt
         const instruction = PROMPT_INSTRUCTIONS[rewriteStyle];
         prompt = `
           You are a text length editor. Your only task is to ${instruction}
