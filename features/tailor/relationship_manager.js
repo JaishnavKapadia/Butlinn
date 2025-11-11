@@ -70,6 +70,18 @@ const relationshipManager = {
             </div>
         `;
 
+        const tailorToggle = this._shadowRoot.querySelector('#butlinn-tailor-toggle');
+        tailorToggle.addEventListener('change', (event) => {
+            const isEnabled = event.target.checked;
+            
+            // Save the new setting to make it persistent across the extension
+            chrome.storage.local.set({ isTailorEnabled: isEnabled });
+
+            if (!isEnabled) {
+                this._handleSelection("General Audience");
+            }
+        });
+
         const panelWidth = 340;
         const padding = 30;
         this._panelHost.style.position = 'fixed';

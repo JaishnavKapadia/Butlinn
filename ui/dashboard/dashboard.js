@@ -1,46 +1,156 @@
 // ui/dashboard/dashboard.js
 
-import { dashboardRelationships } from './dashboard_relationships.js';
-
 document.addEventListener('DOMContentLoaded', () => {
-    dashboardRelationships.init();
+  // --- DOM ELEMENTS ---
+  const logoScreen = document.getElementById('logo-screen');
+  const downloadScreen = document.getElementById('download-screen');
+  const viewContainer = document.getElementById('view-container');
+  const mainScreen = document.getElementById('main-content-screen');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const progressBar = document.getElementById('progressBar');
+  const progressBarFill = document.getElementById('progressBarFill');
+  const downloadError = document.getElementById('download-error');
+  const tabs = document.querySelectorAll('.tab');
+  const featureToggles = document.querySelectorAll('.feature-toggle-area input[type="checkbox"]');
+  const descriptionSlider = document.querySelector('.description-slider');
+  const visualSlider = document.querySelector('.visual-slider');
+  const dashboardBtn = document.getElementById('dashboard-btn');
+  const backToFeaturesBtn = document.getElementById('back-to-features-btn');
+
+  // --- SETTINGS & CONSTANTS ---
+  const MODEL_OPTIONS = { expectedOutputs: [{ type: 'text', languages: ['en'] }] };
+
+  // --- CORE FUNCTIONS ---
+  const showView = (viewName) => {
+    // Hide initial screens if they are visible
+    logoScreen.style.display = 'none';
+    downloadScreen.style.display = 'none';
     
-    // Define all toggle elements
-    const writingSuggestionsToggle = document.getElementById('writingSuggestionsToggle');
-    const tailorToggle = document.getElementById('tailorToggle');
-
-    // Function to load settings from storage and update the UI
-    function loadSettings() {
-        const keys = [
-            'isWritingSuggestionsEnabled',
-            'isTailorEnabled',
-        ];
-        chrome.storage.local.get(keys, (result) => {
-            writingSuggestionsToggle.checked = !!result.isWritingSuggestionsEnabled;
-            tailorToggle.checked = !!result.isTailorEnabled;
-        });
-    }
-
-    // Function to save a setting to storage
-    function saveSetting(key, value) {
-        chrome.storage.local.set({ [key]: value });
-    }
+    // Show the main view container
+    viewContainer.style.display = 'flex';
     
-    // Add event listeners to save changes for all toggles
-    writingSuggestionsToggle.addEventListener('change', (e) => saveSetting('isWritingSuggestionsEnabled', e.target.checked));
-    tailorToggle.addEventListener('change', (e) => saveSetting('isTailorEnabled', e.target.checked));
+    if (viewName === 'features') {
+      viewContainer.style.transform = 'translateX(0%)';
+      setTimeout(() => mainScreen.classList.add('visible'), 50);
+      mainScreen.style.opacity = '1';
+    } else if (viewName === 'dashboard') {
+      viewContainer.style.transform = 'translateX(-100%)';
+    }
+  };
+
+  const showFeature = (featureId) => {
+    const featureIndex = Array.from(tabs).findIndex(tab => tab.dataset.feature === featureId);
+    if (featureIndex === -1) return;
+    const offset = featureIndex * -100;
+    descriptionSlider.style.transform = `translateX(${offset}%)`;
+    visualSlider.style.transform = `translateX(${offset}%)`;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.feature === featureId));
+  };
+  
+  /* --- NEW FUNCTION: Updates the 'disabled' state of a tab based on feature state --- */
+  const updateTabState = (featureId, isEnabled) => {
+    const tab = document.querySelector(`.tab[data-feature="${featureId}"]`);
+    if (tab) {
+      // If the feature is NOT enabled, add the 'disabled' class.
+      tab.classList.toggle('disabled', !isEnabled);
+      // If the feature is disabled, and it's the currently active tab, switch to 'writing' (or first one)
+      // This is still useful as a fallback to ensure the user is seeing an active feature, but it
+      // doesn't block the click listener below.
+      if (!isEnabled && tab.classList.contains('active')) {
+          showFeature('writing');
+      }
+    }
+  };
 
 
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  const saveSettings = () => {
+    // Get current states
+    const isWritingEnabled = document.querySelector('input[data-feature="writing"]').checked;
+    const isTailorEnabled = document.querySelector('input[data-feature="tailor"]').checked;
+    
+    // Update the tab states immediately
+    updateTabState('writing', isWritingEnabled);
+    updateTabState('tailor', isTailorEnabled);
 
-        const type = request.type.replace('dashboard/', '');
-        
-        switch (type) {
-            case 'relationships_list':
-                dashboardRelationships.handleData(request.data);
-                break;
-        }
+    const settings = {
+      isWritingSuggestionsEnabled: isWritingEnabled,
+      isTailorEnabled: isTailorEnabled,
+    };
+    chrome.storage.local.set(settings);
+  };
+
+  const loadSettings = () => {
+    const keys = ['isWritingSuggestionsEnabled', 'isTailorEnabled'];
+    chrome.storage.local.get(keys, (result) => {
+      const isWritingEnabled = !!result.isWritingSuggestionsEnabled;
+      const isTailorEnabled = !!result.isTailorEnabled;
+
+      document.querySelector('input[data-feature="writing"]').checked = isWritingEnabled;
+      document.querySelector('input[data-feature="tailor"]').checked = isTailorEnabled;
+
+      // Update tab states on load
+      updateTabState('writing', isWritingEnabled);
+      updateTabState('tailor', isTailorEnabled);
     });
+  };
 
-    loadSettings();
+  const handleDownload = async () => {
+    downloadBtn.disabled = true;
+    downloadBtn.textContent = 'Downloading...';
+    progressBar.style.display = 'block';
+    downloadError.style.display = 'none';
+    try {
+      const availability = await LanguageModel.availability(MODEL_OPTIONS);
+      if (availability === 'available') {
+        progressBarFill.style.width = '100%';
+        setTimeout(() => { showView('features'); showFeature('writing'); loadSettings(); }, 500);
+        return;
+      }
+      if (availability === 'unavailable') throw new Error('AI Model is not supported on this device.');
+      await LanguageModel.create({
+        ...MODEL_OPTIONS,
+        monitor: (m) => m.addEventListener('downloadprogress', (e) => {
+          progressBarFill.style.width = `${(e.loaded / e.total) * 100}%`;
+        }),
+      });
+      setTimeout(() => { showView('features'); showFeature('writing'); loadSettings(); }, 500);
+    } catch (err) {
+      console.error("Model download error:", err);
+      downloadError.textContent = `Error: ${err.message}. Please try again later.`;
+      downloadError.style.display = 'block';
+      downloadBtn.disabled = false;
+      downloadBtn.textContent = 'Initialize AI Model';
+    }
+  };
+
+  // --- INITIALIZATION ---
+  const initialize = () => {
+    const isNewInstall = new URLSearchParams(window.location.search).get('newinstall') === 'true';
+    if (isNewInstall) {
+      logoScreen.style.display = 'flex';
+      downloadScreen.style.display = 'none';
+      setTimeout(() => {
+        logoScreen.style.display = 'none';
+        downloadScreen.style.display = 'flex';
+      }, 1500);
+    } else {
+      showView('features');
+      showFeature('writing');
+      loadSettings();
+    }
+
+    // Event Listeners
+    downloadBtn.addEventListener('click', handleDownload);
+    
+    // MODIFIED: Removed the check to allow navigation to disabled tabs.
+    tabs.forEach(tab => tab.addEventListener('click', (event) => {
+      showFeature(tab.dataset.feature);
+    }));
+
+    featureToggles.forEach(toggle => toggle.addEventListener('change', saveSettings));
+    dashboardBtn.addEventListener('click', () => showView('dashboard'));
+    backToFeaturesBtn.addEventListener('click', () => showView('features'));
+  };
+
+  initialize();
 });

@@ -1,34 +1,48 @@
-/* ui/dashboard_relationships.css */
+/* ui/dashboard/views/dashboard_relationships.css */
 
-/* --- THIS IS THE FIX --- */
+:root {
+    --bg-color: #202124;
+    --text-color: #e8eaed;
+    --text-color-light: #ffffff;
+    --border-color: #8ab4f8; /* Updated to match new theme */
+    --panel-bg: #303134;
+    --toggle-track-off: #3A3852;
+}
 
-/* The main panel is now a flex column that fills its container. */
+/* --- FIX: Ensure the body fills the iframe --- */
+html, body, .relationships-container {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Google Sans', 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
 .relationships-panel {
     display: flex;
     flex-direction: column;
     height: 100%;
     gap: 16px;
     padding: 20px;
+    box-sizing: border-box;
 }
 
-/* This section is now instructed to GROW and handle its own scrolling. */
 .people-section {
-    flex-grow: 1;       /* Takes up all available vertical space */
-    overflow-y: auto;   /* Will only show a scrollbar if its content overflows */
+    flex-grow: 1;
+    overflow-y: auto;
     padding-right: 10px;
-    min-height: 0;      /* Critical for flexbox scrolling layouts */
+    min-height: 0;
 }
 
-/* This section is told NOT to grow, keeping it at the bottom. */
 .uncategorized-section {
     flex-shrink: 0;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--panel-bg);
     padding-top: 16px;
     max-height: 25%;
     overflow-y: auto;
 }
-/* We no longer need a max-height on individual drop zones.
-   The parent .people-section will handle all scrolling. */
 .person-drop-zone {
     display: grid;
     grid-template-columns: 1fr;
@@ -39,7 +53,6 @@
     padding: 20px;
     transition: all 0.2s ease;
     position: relative;
-    /* max-height and overflow-y are removed from here */
 }
 
 .uncategorized-header {
@@ -95,7 +108,6 @@
     font-style: italic;
 }
 
-/* Custom Scrollbar for the .people-section */
 .people-section {
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) transparent;
@@ -135,7 +147,7 @@
 .person-card.drag-over {
     border: 2px solid var(--border-color);
     transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(193, 167, 106, 0.3);
+    box-shadow: 0 0 15px rgba(138, 180, 248, 0.3);
 }
 
 .compact-card {
@@ -215,7 +227,6 @@
 }
 .alias-item.dragging { opacity: 0.5; }
 
-/* --- Modal Styles --- */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0;

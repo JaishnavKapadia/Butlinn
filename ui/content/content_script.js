@@ -1,4 +1,4 @@
-// content_script.js
+// ui/content/content_script.js
 
 let savedRange = null;
 let activeToolbar = null;
@@ -9,7 +9,7 @@ let fullContext = '';
 let iconDataURL = null;
 let selectionDebounceTimer = null;
 let isButlinnActive = false;
-let activeEditorElement = null; // <-- FIX: Variable to store the correct text field
+let activeEditorElement = null;
 
 let isDragging = false;
 let initialMouseX, initialMouseY;
@@ -27,6 +27,22 @@ let currentVariantIndex = 2;
 const sliderSteps = [0, 25, 50, 75, 100];
 let isVariantLoading = false;
 let streamedVariantText = '';
+
+// --- THIS IS THE FIX (Part 1): Helper function to convert newlines to <br> tags ---
+/**
+ * Converts newline characters (\n) in a string to HTML line break tags (<br>).
+ * @param {string} str The input string.
+ * @returns {string} The string with newlines converted to <br> tags.
+ */
+function nl2br(str) {
+    if (typeof str !== 'string') {
+        return '';
+    }
+    // This regular expression finds all newline characters (\n, \r, or \r\n)
+    // and replaces them globally ('g') with a <br> tag.
+    return str.replace(/(?:\r\n|\r|\n)/g, '<br>');
+}
+// --- END OF FIX (Part 1) ---
 
 function _cleanAIResponse(text) {
     let cleanedText = text.trim();
@@ -62,7 +78,7 @@ async function handleSelectionChange() {
             return;
         }
         savedRange = selection.getRangeAt(0).cloneRange();
-        activeEditorElement = parentEditable; // <-- FIX: Save the correct text field here
+        activeEditorElement = parentEditable;
         showTriggerButton(savedRange);
     }, 200);
 }
@@ -153,7 +169,6 @@ async function handleTriggerClick(event) {
     hideTriggerButton();
 
     if (isTailorEnabled) {
-        // <-- FIX: Pass the saved text field to the workflow
         relationshipManager.startWorkflow(savedRange.cloneRange(), activeEditorElement);
     } else {
         activateButlinn(savedRange.cloneRange(), { useRelationship: false });
@@ -439,14 +454,23 @@ function onDropdownDragEnd() {
     document.removeEventListener('mouseup', onDropdownDragEnd);
 }
 
+// --- THIS IS THE FIX (Part 2): The updated accept function ---
 function acceptSuggestion() {
     if (!savedRange || isVariantLoading) return;
+    
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(savedRange);
-    document.execCommand('insertText', false, currentSuggestion);
+
+    // Convert the plain text suggestion with newlines into an HTML string with <br> tags.
+    const suggestionAsHTML = nl2br(currentSuggestion);
+
+    // Use the 'insertHTML' command to preserve the line breaks.
+    document.execCommand('insertHTML', false, suggestionAsHTML);
+    
     cleanup();
 }
+// --- END OF FIX (Part 2) ---
 
 function cleanup() {
     hideTriggerButton();
@@ -460,5 +484,5 @@ function cleanup() {
     isDragging = false;
     isDropdownDragging = false;
     suggestionVariants = [];
-    activeEditorElement = null; // <-- FIX: Reset the stored element
+    activeEditorElement = null;
 }

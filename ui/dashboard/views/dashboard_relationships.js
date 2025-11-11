@@ -1,4 +1,4 @@
-// ui/dashboard_relationships.js
+// ui/dashboard/views/dashboard_relationships.js
 
 // --- CONSTANTS ---
 const CLOSENESS_LEVELS = {
@@ -26,6 +26,7 @@ export const dashboardRelationships = {
     // --- Initialization ---
     init() {
         this._addEventListeners();
+        // This message is sent to the parent window's service worker
         chrome.runtime.sendMessage({ type: 'relationships/get_all' });
     },
 
@@ -71,12 +72,12 @@ export const dashboardRelationships = {
 
     _createPersonCard(person) {
         const card = document.createElement('div');
-        card.className = 'person-card compact-card'; // Start all cards as compact
+        card.className = 'person-card compact-card';
         card.dataset.personId = person.id;
         card.draggable = true;
         this._addDragListeners(card);
         this._addDropZoneListeners(card);
-        this._setCardContent(card, person, true); // Use a helper to set content
+        this._setCardContent(card, person, true);
         return card;
     },
 
@@ -97,8 +98,6 @@ export const dashboardRelationships = {
 
         const isNowCompact = clickedCard.classList.contains('compact-card');
 
-        // --- THIS IS THE FIX (Part 1) ---
-        // Before doing anything else, find all open cards and close them.
         document.querySelectorAll('.person-card:not(.compact-card)').forEach(openCard => {
             if (openCard !== clickedCard) {
                 const openPersonId = openCard.dataset.personId;
@@ -109,21 +108,16 @@ export const dashboardRelationships = {
                 }
             }
         });
-        // ------------------------------------
 
-        // Now, toggle the state of the card that was actually clicked.
         if (isNowCompact) {
-            // EXPAND THE CARD
             clickedCard.classList.remove('compact-card');
             this._setCardContent(clickedCard, person, false);
         } else {
-            // COLLAPSE THE CARD
             clickedCard.classList.add('compact-card');
             this._setCardContent(clickedCard, person, true);
         }
     },
     
-    // Helper function to set innerHTML, avoiding repetition.
     _setCardContent(cardElement, person, isCompact) {
         if (isCompact) {
             cardElement.innerHTML = `
@@ -195,12 +189,9 @@ export const dashboardRelationships = {
         } else if (targetCategoryZone) {
             targetCategoryZone.classList.remove('drag-over');
             
-            // --- UPDATED LOGIC ---
-            // If dropping on the uncategorized list, dissolve the contact.
             if (targetCategoryZone.id === 'uncategorized-list') {
                 this._dissolvePerson(draggedId);
             } 
-            // Otherwise, just update its closeness category.
             else {
                 const newCloseness = targetCategoryZone.dataset.closenessLevel;
                 this._updateCloseness(draggedId, newCloseness);
@@ -210,20 +201,14 @@ export const dashboardRelationships = {
     
     // --- Core Actions ---
     _updateCloseness(personId, newCloseness) {
-    const person = this._allPeople.find(p => p.id === personId);
-    if (person) {
-        person.closeness = parseInt(newCloseness);
-
-        // --- THIS IS THE NEW, SIMPLIFIED LOGIC ---
-        // Always update the preferred tone to the new category's default,
-        // overwriting any existing value.
-        person.preferredTone = TONE_DEFAULTS[newCloseness];
-        // ------------------------------------------
-
-        this._render();
-        chrome.runtime.sendMessage({ type: 'relationships/update', data: person });
-    }
-},
+        const person = this._allPeople.find(p => p.id === personId);
+        if (person) {
+            person.closeness = parseInt(newCloseness);
+            person.preferredTone = TONE_DEFAULTS[newCloseness];
+            this._render();
+            chrome.runtime.sendMessage({ type: 'relationships/update', data: person });
+        }
+    },
 
     _mergePeople(draggedId, targetId) {
         const draggedPerson = this._allPeople.find(p => p.id === draggedId);
@@ -239,30 +224,25 @@ export const dashboardRelationships = {
 
     _dissolvePerson(personId) {
         const personToDissolve = this._allPeople.find(p => p.id === personId);
-        // If it's not a merged contact or doesn't exist, just move it normally.
         if (!personToDissolve || personToDissolve.aliases.length <= 1) {
             this._updateCloseness(personId, 0);
             return;
         }
 
-        // Create new person objects for the primary name and each unique alias
         const allNames = [...new Set([personToDissolve.primaryName, ...personToDissolve.aliases])];
         const newPeople = allNames.map(name => ({
             id: crypto.randomUUID(),
             primaryName: name,
             aliases: [name],
             closeness: 0,
-            preferredTone: 'Professional', // Reset to default
+            preferredTone: 'Professional',
             notes: ''
         }));
 
-        // Update the local state: remove the old merged person and add the new individuals
         this._allPeople = this._allPeople.filter(p => p.id !== personId);
         this._allPeople.push(...newPeople);
+        this._render();
 
-        this._render(); // Re-render the UI with the changes
-
-        // Send a message to the backend to update the database
         chrome.runtime.sendMessage({
             type: 'relationships/dissolve',
             data: {
@@ -271,7 +251,6 @@ export const dashboardRelationships = {
             }
         });
     },
-
 
     _clearUncategorized() {
         if (!confirm("Are you sure you want to permanently delete all uncategorized contacts?")) return;
@@ -315,7 +294,13 @@ export const dashboardRelationships = {
         document.getElementById('modal-save-btn').addEventListener('click', this._saveModalChanges.bind(this));
         document.getElementById('modal-cancel-btn').addEventListener('click', this._closeEditModal.bind(this));
 
-        // Use event delegation for dynamically created cards and buttons
+        // Listen for messages from the background script
+        chrome.runtime.onMessage.addListener((request) => {
+            if (request.type === 'dashboard/relationships_list') {
+                this.handleData(request.data);
+            }
+        });
+        
         document.getElementById('categories-container').addEventListener('click', (event) => {
             const card = event.target.closest('.person-card');
             const editButton = event.target.closest('.edit-btn');
@@ -331,3 +316,6 @@ export const dashboardRelationships = {
         this._addDropZoneListeners(uncategorizedList);
     }
 };
+
+// Initialize the script
+dashboardRelationships.init();

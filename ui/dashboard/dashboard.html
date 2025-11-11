@@ -1,92 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Butlinn - Your Personal AI Butler</title>
+  <title>Butlinn Dashboard</title>
   <link rel="stylesheet" href="dashboard.css">
-  <link rel="stylesheet" href="dashboard_relationships.css">
 </head>
 <body>
 
-  <!-- Modal for editing a person's details -->
-  <div id="edit-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <h3>Edit Relationship</h3>
-        <div class="form-group">
-            <label for="edit-primaryName">Primary Name</label>
-            <input type="text" id="edit-primaryName">
+  <!-- These initial screens are outside the main view container -->
+  <div class="screen" id="logo-screen" style="display: none;">
+    <div class="logo-animation">Butlinn</div>
+  </div>
+  <div class="screen" id="download-screen" style="display: none;">
+    <h1>One-Time Setup</h1>
+    <p>To power the AI features, Butlinn needs to download the on-device language model. This is a one-time download and happens securely in the background.</p>
+    <button id="downloadBtn">Initialize AI Model</button>
+    <div class="progress-bar" id="progressBar" style="display: none;"><div class="progress-bar-fill" id="progressBarFill"></div></div>
+    <p id="download-error" style="color: #f28b82; display: none; margin-top: 15px;"></p>
+  </div>
+
+  <!-- This container will hold the sliding screens -->
+  <div id="view-container" style="display: none;">
+    <div class="screen" id="main-content-screen">
+      <div class="main-layout">
+        <div class="feature-description">
+          <div class="description-slider">
+            <!-- Feature 1: Writing Suggestions -->
+            <div class="feature-content">
+              <h1>Context-Aware Writing Suggestions</h1>
+              <p>Select any text you're writing, and Butlinn will offer professional rewrites and improvements directly on the page.</p>
+              <div class="feature-toggle-area"><span>Enable Suggestions</span><label class="switch"><input type="checkbox" data-feature="writing"><span class="slider"></span></label></div>
+            </div>
+            <!-- Feature 2: Tailor -->
+            <div class="feature-content">
+              <h1>Tailor to Your Relationships</h1>
+              <p>Butlinn intelligently finds who you're writing to and tailors the suggestion to match the tone you've defined for that relationship.</p>
+              <div class="feature-toggle-area"><span>Enable Tailor</span><label class="switch"><input type="checkbox" data-feature="tailor"><span class="slider"></span></label></div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-            <label for="edit-closeness">Closeness</label>
-            <input type="range" id="edit-closeness" min="1" max="5" step="1">
+        <div class="feature-visual">
+          <div class="visual-slider">
+            <!-- --- THIS IS THE CHANGE --- -->
+            <img src="assets/feature_writing.gif" alt="Writing suggestions animation">
+            <img src="assets/feature_tailor.gif" alt="Tailor feature animation">
+            <!-- --- END OF CHANGE --- -->
+          </div>
         </div>
-        <div class="form-group">
-            <label for="edit-tone">Preferred Tone</label>
-            <input type="text" id="edit-tone">
+      </div>
+      <div class="bottom-nav">
+        <div class="feature-tabs">
+          <div class="tab active" data-feature="writing">Suggestions</div>
+          <div class="tab" data-feature="tailor">Tailor</div>
         </div>
-        <div class="form-group">
-            <label for="edit-notes">Notes</label>
-            <textarea id="edit-notes" rows="3"></textarea>
-        </div>
-        <div class="modal-actions">
-            <button id="modal-cancel-btn">Cancel</button>
-            <button id="modal-save-btn">Save</button>
-        </div>
+        <div id="dashboard-btn" class="nav-btn">Manage Relationships</div>
+      </div>
+    </div>
+    
+    <!-- Dashboard Screen: Now contains an iframe to load the relationships manager -->
+    <div class="screen" id="dashboard-screen">
+      <div id="back-to-features-btn" class="nav-btn back-btn">Back to Features</div>
+      <iframe src="views/relationships.html" class="dashboard-iframe"></iframe>
     </div>
   </div>
 
-
-  <div class="dashboard-container">
-    <header class="dashboard-header">Butlinn</header>
-
-    <main class="dashboard-main">
-      
-      <div class="main-content-area">
-        <div class="relationships-wrapper panel">
-            <div class="relationships-panel">
-                <h3>Relationships</h3>
-                
-                <div class="people-section">
-                    <div id="categories-container"></div>
-                </div>
-
-                <div class="uncategorized-section">
-                    <div class="uncategorized-header">
-                        <h5>Uncategorized Contacts</h5>
-                        <button id="clear-uncategorized-btn">Clear All</button>
-                    </div>
-                    <div id="uncategorized-list" class="person-drop-zone"></div>
-                </div>
-            </div>
-        </div>
-      </div>
-
-      <aside class="sidebar-right">
-        <div class="panel">
-            <h3>Features Control</h3>
-            <div class="settings-list">
-              <div class="setting-item">
-                <label for="writingSuggestionsToggle">Writing Suggestions</label>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="writingSuggestionsToggle">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="setting-item">
-                <label for="tailorToggle">Tailor Suggestions</label>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="tailorToggle">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-        </div>
-      </aside>
-
-    </main>
-  </div>
-  
-  <script type="module" src="dashboard_relationships.js"></script>
-  <script type="module" src="dashboard.js"></script>
+  <script src="dashboard.js"></script>
 </body>
 </html>

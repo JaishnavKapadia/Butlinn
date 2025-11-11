@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Butlinn - Relationships</title>
+  <!-- Paths updated to be relative to this file's new location -->
+  <link rel="stylesheet" href="dashboard_relationships.css">
+</head>
+<body>
+
+  <!-- Modal for editing a person's details -->
+  <div id="edit-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3>Edit Relationship</h3>
+        <div class="form-group">
+            <label for="edit-primaryName">Primary Name</label>
+            <input type="text" id="edit-primaryName">
+        </div>
+        <div class="form-group">
+            <label for="edit-closeness">Closeness</label>
+            <input type="range" id="edit-closeness" min="1" max="5" step="1">
+        </div>
+        <div class="form-group">
+            <label for="edit-tone">Preferred Tone</label>
+            <input type="text" id="edit-tone">
+        </div>
+        <div class="form-group">
+            <label for="edit-notes">Notes</label>
+            <textarea id="edit-notes" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+            <button id="modal-cancel-btn">Cancel</button>
+            <button id="modal-save-btn">Save</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- The main container for the relationships UI -->
+  <div class="relationships-container">
+      <div class="relationships-panel">
+          <h3>Relationships</h3>
+          
+          <div class="people-section">
+              <div id="categories-container"></div>
+          </div>
+
+          <div class="uncategorized-section">
+              <div class="uncategorized-header">
+                  <h5>Uncategorized Contacts</h5>
+                  <button id="clear-uncategorized-btn">Clear All</button>
+              </div>
+              <div id="uncategorized-list" class="person-drop-zone"></div>
+          </div>
+      </div>
+  </div>
+  
+  <script type="module" src="dashboard_relationships.js"></script>
+</body>
+</html>
