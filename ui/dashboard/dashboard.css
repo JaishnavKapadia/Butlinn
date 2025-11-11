@@ -132,7 +132,6 @@ body {
 }
 
 .feature-visual {
-  /* Set a fixed height for the visual container to prevent layout shifting */
   height: 400px; 
 }
 
@@ -148,9 +147,7 @@ body {
   flex-shrink: 0;
 }
 .feature-visual img {
-  /* Fill the new fixed height container */
   height: 100%; 
-  /* Scale the image down to fit inside the container without cropping */
   object-fit: contain; 
 }
 
@@ -191,7 +188,7 @@ body {
 .tab {
   padding: 10px 20px;
   border-radius: 12px;
-  cursor: pointer; /* Keep normal pointer for clicking */
+  cursor: pointer; 
   transition: background-color 0.3s, opacity 0.3s;
   font-weight: 500;
   border: 2px solid transparent;
@@ -202,19 +199,19 @@ body {
   border: 2px solid var(--accent-blue);
 }
 
-/* New style for disabled tabs */
+
 .tab.disabled {
   opacity: 0.5;
   background-color: var(--surface-color);
   border: 2px solid transparent;
 }
-/* Ensure a disabled tab doesn't look active when its feature is off but it's the current screen */
+
 .tab.disabled.active {
-    background-color: var(--tab-active-bg); /* Use active background */
-    border: 2px solid transparent; /* Remove border to distinguish from fully active/enabled */
+    background-color: var(--tab-active-bg); 
+    border: 2px solid transparent; 
 }
 .tab.disabled:hover {
-    background-color: var(--tab-active-bg); /* Allow it to appear clickable on hover */
+    background-color: var(--tab-active-bg); 
 }
 
 
@@ -292,7 +289,6 @@ input:checked+.slider:before {
   transform: translateX(22px);
 }
 
-/* --- NEW STYLES for Dashboard screen and Iframe --- */
 #dashboard-screen {
   position: relative;
 }
@@ -308,5 +304,5 @@ input:checked+.slider:before {
   width: 100%;
   height: 100%;
   border: none;
-  background-color: var(--bg-color); /* Match background color */
+  background-color: var(--bg-color); 
 }

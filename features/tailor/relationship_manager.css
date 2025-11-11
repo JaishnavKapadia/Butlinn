@@ -3,7 +3,6 @@
 .butlinn-relationship-panel {
     position: fixed;
     z-index: 1000000;
-    /* --- THIS IS THE FIX (Part 2): Increased width --- */
     width: 340px;
     background-color: #333;
     color: white;
@@ -24,7 +23,6 @@
     padding: 0;
 }
 
-/* --- UPDATED for new layout --- */
 .butlinn-panel-header {
     padding: 10px 16px;
     font-size: 14px;
@@ -38,7 +36,6 @@
     user-select: none;
 }
 
-/* --- NEW container for toggles --- */
 .butlinn-panel-controls {
     display: flex;
     flex-direction: column;
@@ -48,7 +45,7 @@
 .butlinn-panel-toggle-container {
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* Aligns items to the right */
+    justify-content: flex-end; 
     gap: 8px;
     font-size: 13px;
     color: #ccc;
@@ -78,7 +75,7 @@
     flex-direction: column;
     padding: 8px;
     gap: 4px;
-    max-height: 250px; /* Increased max-height */
+    max-height: 250px;
     overflow-y: auto;
 }
 
@@ -100,7 +97,6 @@
     background-color: #4C4A69;
 }
 
-/* --- Toggle Switch Styles (Unchanged but included for completeness) --- */
 .butlinn-relationship-panel .butlinn-toggle-switch {
     position: relative;
     display: inline-block;

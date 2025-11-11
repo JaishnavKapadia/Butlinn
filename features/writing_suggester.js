@@ -29,15 +29,11 @@ export async function getSuggestion(data) {
 
     if (rewriteStyle === 'initial' && useRelationship && recipientAlias) {
         
-        // --- THIS IS THE FIX ---
-        // Instead of a direct, case-sensitive lookup, we now get all relationships
-        // and perform a case-insensitive search against all of their aliases.
         const allRelationships = await storage.getAllRelationships();
         const normalizedRecipient = recipientAlias.trim().toLowerCase();
         const relationship = allRelationships.find(person =>
             person.aliases.some(alias => alias.trim().toLowerCase() === normalizedRecipient)
         );
-        // -----------------------
 
         if (relationship) {
             // SCENARIO A: We know this person.

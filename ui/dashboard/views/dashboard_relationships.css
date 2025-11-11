@@ -4,12 +4,11 @@
     --bg-color: #202124;
     --text-color: #e8eaed;
     --text-color-light: #ffffff;
-    --border-color: #8ab4f8; /* Updated to match new theme */
+    --border-color: #8ab4f8; 
     --panel-bg: #303134;
     --toggle-track-off: #3A3852;
 }
 
-/* --- FIX: Ensure the body fills the iframe --- */
 html, body, .relationships-container {
     height: 100%;
     margin: 0;

@@ -2,7 +2,6 @@
 // --- Listens for events and delegates AI tasks to offscreen. ---
 
 chrome.runtime.onInstalled.addListener((details) => {
-    // --- THIS IS THE NEW ONBOARDING LOGIC ---
     if (details.reason === 'install') {
         // On first install, open the dashboard with a parameter to trigger the intro animation.
         const url = chrome.runtime.getURL('ui/dashboard/dashboard.html?newinstall=true');

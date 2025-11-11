@@ -2,10 +2,7 @@
 
 /* --- Butlinn trigger button: connected look like OpenAI --- */
 #butlinn-trigger-btn {
-  /* --- THE DEFINITIVE FIX: Reset all inherited styles first --- */
   all: initial;
-
-  /* --- Now, re-apply ONLY the styles we need --- */
   position: absolute;
   z-index: 999999;
   width: 30px;
@@ -29,7 +26,6 @@
 }
 
 #butlinn-trigger-btn img {
-  /* Re-apply the necessary image styles */
   all: initial;
   width: 100%;
   height: 100%;
@@ -41,9 +37,6 @@
   content: none !important;
 }
 
-
-
-/* The floating toolbar with accept/reject buttons */
 .butlinn-toolbar {
   position: absolute;
   z-index: 1000000 !important;

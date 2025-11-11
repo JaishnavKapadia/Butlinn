@@ -28,7 +28,7 @@ const sliderSteps = [0, 25, 50, 75, 100];
 let isVariantLoading = false;
 let streamedVariantText = '';
 
-// --- THIS IS THE FIX (Part 1): Helper function to convert newlines to <br> tags ---
+
 /**
  * Converts newline characters (\n) in a string to HTML line break tags (<br>).
  * @param {string} str The input string.
@@ -38,11 +38,8 @@ function nl2br(str) {
     if (typeof str !== 'string') {
         return '';
     }
-    // This regular expression finds all newline characters (\n, \r, or \r\n)
-    // and replaces them globally ('g') with a <br> tag.
     return str.replace(/(?:\r\n|\r|\n)/g, '<br>');
 }
-// --- END OF FIX (Part 1) ---
 
 function _cleanAIResponse(text) {
     let cleanedText = text.trim();
@@ -454,7 +451,7 @@ function onDropdownDragEnd() {
     document.removeEventListener('mouseup', onDropdownDragEnd);
 }
 
-// --- THIS IS THE FIX (Part 2): The updated accept function ---
+
 function acceptSuggestion() {
     if (!savedRange || isVariantLoading) return;
     
@@ -462,15 +459,12 @@ function acceptSuggestion() {
     selection.removeAllRanges();
     selection.addRange(savedRange);
 
-    // Convert the plain text suggestion with newlines into an HTML string with <br> tags.
+    
     const suggestionAsHTML = nl2br(currentSuggestion);
-
-    // Use the 'insertHTML' command to preserve the line breaks.
     document.execCommand('insertHTML', false, suggestionAsHTML);
     
     cleanup();
 }
-// --- END OF FIX (Part 2) ---
 
 function cleanup() {
     hideTriggerButton();

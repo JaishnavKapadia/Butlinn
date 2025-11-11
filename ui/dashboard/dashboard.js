@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- CORE FUNCTIONS ---
   const showView = (viewName) => {
-    // Hide initial screens if they are visible
     logoScreen.style.display = 'none';
     downloadScreen.style.display = 'none';
     
@@ -47,15 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
     tabs.forEach(t => t.classList.toggle('active', t.dataset.feature === featureId));
   };
   
-  /* --- NEW FUNCTION: Updates the 'disabled' state of a tab based on feature state --- */
   const updateTabState = (featureId, isEnabled) => {
     const tab = document.querySelector(`.tab[data-feature="${featureId}"]`);
     if (tab) {
-      // If the feature is NOT enabled, add the 'disabled' class.
       tab.classList.toggle('disabled', !isEnabled);
-      // If the feature is disabled, and it's the currently active tab, switch to 'writing' (or first one)
-      // This is still useful as a fallback to ensure the user is seeing an active feature, but it
-      // doesn't block the click listener below.
       if (!isEnabled && tab.classList.contains('active')) {
           showFeature('writing');
       }

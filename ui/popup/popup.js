@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.set({ [key]: value });
     }
     
-    // Add event listeners to save changes for all toggles
     writingSuggestionsToggle.addEventListener('change', (e) => saveSetting('isWritingSuggestionsEnabled', e.target.checked));
     tailorToggle.addEventListener('change', (e) => saveSetting('isTailorEnabled', e.target.checked));
 
@@ -38,6 +37,5 @@ document.addEventListener('DOMContentLoaded', () => {
         openApp();
     });
 
-    // Load the settings when the popup is opened
     loadSettings();
 });
